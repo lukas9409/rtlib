@@ -13,7 +13,8 @@ add_subdirectory(googletest-release-1.10.0)
 set(TESTED_FILES
     ../src/for_tests/list.c
     ../src/for_tests/vector.c
-    ../src/for_tests/object_pool.c)
+    ../src/for_tests/object_pool.c
+    ../src/protocols/publish_subscribe/pubsub_prot.cpp)
 
 set(TESTS
     list_test.cpp
@@ -23,6 +24,7 @@ set(TESTS
     typed_pool_test.cpp
     queue_containers_test.cpp
     set_test.cpp
+    pubsub_prot_test.cpp
     )
 
 set(CMAKE_CXX_FLAGS "-Wall -Werror -save-temps=obj")
