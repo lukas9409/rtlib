@@ -2,6 +2,7 @@
 
 #include <assert.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include "error_codes.h"
 
 #define declare_custom_allocator_binary_tree_t(container_t, member_t, allocator_t) \

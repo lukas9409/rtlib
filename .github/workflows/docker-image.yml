@@ -7,12 +7,14 @@ on:
       - 'release/**'
       - 'develop'
       - 'feature/**'
+      - 'hotfix/**'
   pull_request:
     branches: 
       - 'master'
       - 'release/**'
       - 'develop'
       - 'feature/**'
+      - 'hotfix/**'
 
 jobs:
 
@@ -24,11 +26,11 @@ jobs:
     - uses: actions/checkout@v2
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag rtlib-docker-image
-    - name: Build UTs
+    - name: Build CI executables
       run: | 
         mkdir -p -v build
         docker run --rm --privileged -v ${PWD}:${PWD} -w=${PWD}/build rtlib-docker-image cmake -DCMAKE_BUILD_TYPE=Release ..
-        docker run --rm --privileged -v ${PWD}:${PWD} -w=${PWD}/build rtlib-docker-image make ut
+        docker run --rm --privileged -v ${PWD}:${PWD} -w=${PWD}/build rtlib-docker-image make all
     - name: Run UTs
       run: ./build/ci/ut --gtest_output="xml:testresults.xml"
     - name: Publish Test Report
@@ -36,8 +38,6 @@ jobs:
       with:
         report_paths: 'testresults.xml'
         github_token: ${{ secrets.GITHUB_TOKEN }}
-    - name: Build performance tests
-      run: docker run --rm --privileged -v ${PWD}:${PWD} -w=${PWD}/build rtlib-docker-image make performance_tests
     - name: Run performance tests
       run: ./build/ci/performance_tests
     - name: Generate performace charts

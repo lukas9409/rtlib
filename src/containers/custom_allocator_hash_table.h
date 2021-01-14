@@ -2,6 +2,8 @@
 
 #include <assert.h>
 #include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
 #include "error_codes.h"
 
 #define declare_custom_allocator_hash_table_t(container_t, member_t, allocator_t) \

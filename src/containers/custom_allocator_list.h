@@ -1,7 +1,9 @@
 #pragma once
 
 #include <assert.h>
+#include <stdlib.h>
 #include <stdbool.h>
+#include "error_codes.h"
 
 #define declare_custom_allocator_list_t(container_t, member_t, allocator_t) \
 typedef struct container_t container_t; \

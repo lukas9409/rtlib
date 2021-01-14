@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <string.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include "error_codes.h"
 
 #define declare_custom_allocator_vector_t(container_t, member_t, allocator_t) \

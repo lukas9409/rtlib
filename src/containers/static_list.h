@@ -1,7 +1,9 @@
 #pragma once
 
 #include <assert.h>
+#include <stdlib.h>
 #include <stdbool.h>
+#include "error_codes.h"
 #include "../memory/typed_pool.h"
 
 #define declare_static_list_t(container_t, member_t, container_capacity) \

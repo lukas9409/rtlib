@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdlib.h>
+
 #define declare_dynamic_allocator_t(container_t) \
 \
 typedef struct container_t \

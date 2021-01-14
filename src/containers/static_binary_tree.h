@@ -2,6 +2,7 @@
 
 #include <assert.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include "../memory/typed_pool.h"
 #include "error_codes.h"
 
