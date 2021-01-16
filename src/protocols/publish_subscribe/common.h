@@ -28,6 +28,11 @@ extern "C"
 
     typedef enum
     {
+        VERSION_1
+    } PubsubProtVersion;
+
+    typedef enum
+    {
         ID_1BYTE,
         ID_2BYTE,
         ID_3BYTE,
@@ -81,22 +86,12 @@ extern "C"
 
     typedef struct PubSubHeaderV1
     {
-        PubSubIdSize id_size;
-        PubSubPayloadParametersSize payload_length_size;
-        PubsubProtQoS qos;
-        PubsubProtCrc crc;
-        PubSubPid pid;
+        uint8_t id_size : 3;
+        uint8_t payload_length_size : 2;
+        uint8_t qos : 2;
+        uint8_t crc : 2;
+        uint8_t pid : 4;
     } PubSubHeaderV1;
-
-    // typedef struct PubSubHeaderV1
-    // {
-    //     uint8_t version : 3;
-    //     uint8_t id_size : 3;
-    //     uint8_t payload_length_size : 2;
-    //     uint8_t qos : 2;
-    //     uint8_t crc : 2;
-    //     uint8_t pid : 4;
-    // } PubSubHeaderV1;
 
     int packHeaderV1(PubSubHeaderV1 header, uint8_t * data, int size);
     int unpackHeaderV1(PubSubHeaderV1 * header, const uint8_t * data, int size);

@@ -11,15 +11,15 @@
 +---------+---------+---------------------+------+------+------+------+-------------+---------+------+
 */
 
-typedef struct PubSubHeaderBitfieldV1
+typedef struct PubSubHeaderV1Internal
 {
-    uint8_t version : 3;
+    uint8_t version_id : 3;  // Common field in all headers
     uint8_t id_size : 3;
     uint8_t payload_length_size : 2;
     uint8_t qos : 2;
     uint8_t crc : 2;
     uint8_t pid : 4;
-} PubSubHeaderBitfieldV1;
+} PubSubHeaderV1Internal;
 
 int packHeaderV1(PubSubHeaderV1 header, uint8_t * data, int size)
 {
@@ -28,31 +28,20 @@ int packHeaderV1(PubSubHeaderV1 header, uint8_t * data, int size)
         return -1;
     }
 
-    if(size < sizeof(PubSubHeaderBitfieldV1))
+    if(size < sizeof(PubSubHeaderV1))
     {
         return -1;
     }
-    memset(data, 0, sizeof(PubSubHeaderBitfieldV1));
 
-    // PubSubHeaderBitfieldV1 bifield = { .version             = 0,
-    //                                    .id_size             = header.id_size,
-    //                                    .payload_length_size = header.payload_length_size,
-    //                                    .qos                 = header.qos,
-    //                                    .crc                 = header.crc,
-    //                                    .pid                 = header.pid };
+    PubSubHeaderV1Internal complete_header = { .version_id          = VERSION_1,
+                                               .id_size             = header.id_size,
+                                               .payload_length_size = header.payload_length_size,
+                                               .qos                 = header.qos,
+                                               .crc                 = header.crc,
+                                               .pid                 = header.pid };
+    memcpy(data, &complete_header, sizeof(complete_header));
 
-    // pack byte by byte
-    uint8_t firstByte  = 0;
-    uint8_t secondByte = 0;
-
-    firstByte  = header.id_size << 2 | header.payload_length_size;
-    secondByte = header.qos << 6 | header.crc << 4 | header.pid;
-
-    data[0] = firstByte;
-    data[1] = secondByte;
-    // memcpy(data, &bifield, sizeof(bifield));
-
-    return 2;
+    return sizeof(complete_header);
 }
 
 int unpackHeaderV1(PubSubHeaderV1 * header, const uint8_t * data, int size)

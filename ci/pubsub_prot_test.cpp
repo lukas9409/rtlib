@@ -34,19 +34,19 @@ INSTANTIATE_TEST_SUITE_P(
         std::make_tuple(PubSubIdSize::ID_1BYTE, PubSubPayloadParametersSize::PAYLOAD_0BYTE, PubsubProtQoS::QoS0,
                         PubsubProtCrc::Crc_None, PubSubPid::PUBLISH, std::vector<uint8_t>{ 0x0, 0x0 }),
         std::make_tuple(PubSubIdSize::ID_2BYTE, PubSubPayloadParametersSize::PAYLOAD_0BYTE, PubsubProtQoS::QoS0,
-                        PubsubProtCrc::Crc_None, PubSubPid::PUBLISH, std::vector<uint8_t>{ 0x4, 0x0 }),
-        std::make_tuple(PubSubIdSize::ID_3BYTE, PubSubPayloadParametersSize::PAYLOAD_0BYTE, PubsubProtQoS::QoS0,
                         PubsubProtCrc::Crc_None, PubSubPid::PUBLISH, std::vector<uint8_t>{ 0x8, 0x0 }),
-        std::make_tuple(PubSubIdSize::ID_4BYTE, PubSubPayloadParametersSize::PAYLOAD_0BYTE, PubsubProtQoS::QoS0,
-                        PubsubProtCrc::Crc_None, PubSubPid::PUBLISH, std::vector<uint8_t>{ 0xC, 0x0 }),
-        std::make_tuple(PubSubIdSize::ID_5BYTE, PubSubPayloadParametersSize::PAYLOAD_0BYTE, PubsubProtQoS::QoS0,
+        std::make_tuple(PubSubIdSize::ID_3BYTE, PubSubPayloadParametersSize::PAYLOAD_0BYTE, PubsubProtQoS::QoS0,
                         PubsubProtCrc::Crc_None, PubSubPid::PUBLISH, std::vector<uint8_t>{ 0x10, 0x0 }),
-        std::make_tuple(PubSubIdSize::ID_6BYTE, PubSubPayloadParametersSize::PAYLOAD_0BYTE, PubsubProtQoS::QoS0,
-                        PubsubProtCrc::Crc_None, PubSubPid::PUBLISH, std::vector<uint8_t>{ 0x14, 0x0 }),
-        std::make_tuple(PubSubIdSize::ID_7BYTE, PubSubPayloadParametersSize::PAYLOAD_0BYTE, PubsubProtQoS::QoS0,
+        std::make_tuple(PubSubIdSize::ID_4BYTE, PubSubPayloadParametersSize::PAYLOAD_0BYTE, PubsubProtQoS::QoS0,
                         PubsubProtCrc::Crc_None, PubSubPid::PUBLISH, std::vector<uint8_t>{ 0x18, 0x0 }),
+        std::make_tuple(PubSubIdSize::ID_5BYTE, PubSubPayloadParametersSize::PAYLOAD_0BYTE, PubsubProtQoS::QoS0,
+                        PubsubProtCrc::Crc_None, PubSubPid::PUBLISH, std::vector<uint8_t>{ 0x20, 0x0 }),
+        std::make_tuple(PubSubIdSize::ID_6BYTE, PubSubPayloadParametersSize::PAYLOAD_0BYTE, PubsubProtQoS::QoS0,
+                        PubsubProtCrc::Crc_None, PubSubPid::PUBLISH, std::vector<uint8_t>{ 0x28, 0x0 }),
+        std::make_tuple(PubSubIdSize::ID_7BYTE, PubSubPayloadParametersSize::PAYLOAD_0BYTE, PubsubProtQoS::QoS0,
+                        PubsubProtCrc::Crc_None, PubSubPid::PUBLISH, std::vector<uint8_t>{ 0x30, 0x0 }),
         std::make_tuple(PubSubIdSize::ID_8BYTE, PubSubPayloadParametersSize::PAYLOAD_0BYTE, PubsubProtQoS::QoS0,
-                        PubsubProtCrc::Crc_None, PubSubPid::PUBLISH, std::vector<uint8_t>{ 0x1c, 0x0 })
+                        PubsubProtCrc::Crc_None, PubSubPid::PUBLISH, std::vector<uint8_t>{ 0x38, 0x0 })
 
             ));
 
@@ -66,5 +66,5 @@ TEST_P(PubSubTest, _1)
 
     uint8_t parsed_header[2]{};
     ASSERT_EQ(packHeaderV1(header, parsed_header, 2), 2);
-    ASSERT_THAT(expected_header, ElementsAreArray(parsed_header));
+    ASSERT_THAT(parsed_header, ElementsAreArray(expected_header));
 }
