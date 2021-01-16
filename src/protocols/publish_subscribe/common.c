@@ -39,10 +39,15 @@ int packHeaderV1(PubSubHeaderV1 header, uint8_t * data, int size)
                                                .qos                 = header.qos,
                                                .crc                 = header.crc,
                                                .pid                 = header.pid };
-    memcpy(data, &complete_header, sizeof(complete_header));
+    // memcpy(data, &complete_header, sizeof(complete_header));
+
+    data[0] = VERSION_1 << 5 | header.id_size << 2 | header.payload_length_size;
+    data[1] = header.qos << 6 | header.crc << 4 | header.pid;
 
     return sizeof(complete_header);
 }
 
 int unpackHeaderV1(PubSubHeaderV1 * header, const uint8_t * data, int size)
-{}
+{
+    return 0;
+}
