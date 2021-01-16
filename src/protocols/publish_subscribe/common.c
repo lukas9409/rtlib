@@ -11,6 +11,16 @@
 +---------+---------+---------------------+------+------+------+------+-------------+---------+------+
 */
 
+typedef struct PubSubHeaderBitfieldV1
+{
+    uint8_t version : 3;
+    uint8_t id_size : 3;
+    uint8_t payload_length_size : 2;
+    uint8_t qos : 2;
+    uint8_t crc : 2;
+    uint8_t pid : 4;
+} PubSubHeaderBitfieldV1;
+
 int packHeaderV1(PubSubHeaderV1 header, uint8_t * data, int size)
 {
     if(!data)
@@ -18,11 +28,18 @@ int packHeaderV1(PubSubHeaderV1 header, uint8_t * data, int size)
         return -1;
     }
 
-    if(size < sizeof(header))
+    if(size < sizeof(PubSubHeaderBitfieldV1))
     {
         return -1;
     }
-    memset(data, 0, sizeof(header));
+    memset(data, 0, sizeof(PubSubHeaderBitfieldV1));
+
+    // PubSubHeaderBitfieldV1 bifield = { .version             = 0,
+    //                                    .id_size             = header.id_size,
+    //                                    .payload_length_size = header.payload_length_size,
+    //                                    .qos                 = header.qos,
+    //                                    .crc                 = header.crc,
+    //                                    .pid                 = header.pid };
 
     // pack byte by byte
     uint8_t firstByte  = 0;
@@ -33,8 +50,9 @@ int packHeaderV1(PubSubHeaderV1 header, uint8_t * data, int size)
 
     data[0] = firstByte;
     data[1] = secondByte;
+    // memcpy(data, &bifield, sizeof(bifield));
 
-    return sizeof(header);
+    return 2;
 }
 
 int unpackHeaderV1(PubSubHeaderV1 * header, const uint8_t * data, int size)

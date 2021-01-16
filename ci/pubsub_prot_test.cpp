@@ -19,8 +19,8 @@ struct MockPubSubSystemUtils : public IPubSubSystemUtils
 };
 
 class PubSubTest
-    : public testing::TestWithParam<std::tuple<int, PubSubIdSize, PubSubPayloadParametersSize, PubsubProtQoS,
-                                               PubsubProtCrc, PubSubPid, std::vector<uint8_t>>>
+    : public testing::TestWithParam<std::tuple<PubSubIdSize, PubSubPayloadParametersSize, PubsubProtQoS, PubsubProtCrc,
+                                               PubSubPid, std::vector<uint8_t>>>
 {
    public:
     MockPubSubTransportLayer transportLayer{};
@@ -28,28 +28,43 @@ class PubSubTest
     PubSubProtocol protocol{ &transportLayer, &systemUtils };
 };
 
-INSTANTIATE_TEST_SUITE_P(PubSubTestName, PubSubTest,
-                         testing::Values(std::make_tuple(64, PubSubIdSize::ID_1BYTE,
-                                                         PubSubPayloadParametersSize::PAYLOAD_1BYTE,
-                                                         PubsubProtQoS::QoS0, PubsubProtCrc::Crc_None,
-                                                         PubSubPid::PUBLISH, std::vector<uint8_t>{ 0x1, 0x0 })));
+INSTANTIATE_TEST_SUITE_P(
+    PubSubTestName, PubSubTest,
+    testing::Values(
+        std::make_tuple(PubSubIdSize::ID_1BYTE, PubSubPayloadParametersSize::PAYLOAD_0BYTE, PubsubProtQoS::QoS0,
+                        PubsubProtCrc::Crc_None, PubSubPid::PUBLISH, std::vector<uint8_t>{ 0x0, 0x0 }),
+        std::make_tuple(PubSubIdSize::ID_2BYTE, PubSubPayloadParametersSize::PAYLOAD_0BYTE, PubsubProtQoS::QoS0,
+                        PubsubProtCrc::Crc_None, PubSubPid::PUBLISH, std::vector<uint8_t>{ 0x4, 0x0 }),
+        std::make_tuple(PubSubIdSize::ID_3BYTE, PubSubPayloadParametersSize::PAYLOAD_0BYTE, PubsubProtQoS::QoS0,
+                        PubsubProtCrc::Crc_None, PubSubPid::PUBLISH, std::vector<uint8_t>{ 0x8, 0x0 }),
+        std::make_tuple(PubSubIdSize::ID_4BYTE, PubSubPayloadParametersSize::PAYLOAD_0BYTE, PubsubProtQoS::QoS0,
+                        PubsubProtCrc::Crc_None, PubSubPid::PUBLISH, std::vector<uint8_t>{ 0xC, 0x0 }),
+        std::make_tuple(PubSubIdSize::ID_5BYTE, PubSubPayloadParametersSize::PAYLOAD_0BYTE, PubsubProtQoS::QoS0,
+                        PubsubProtCrc::Crc_None, PubSubPid::PUBLISH, std::vector<uint8_t>{ 0x10, 0x0 }),
+        std::make_tuple(PubSubIdSize::ID_6BYTE, PubSubPayloadParametersSize::PAYLOAD_0BYTE, PubsubProtQoS::QoS0,
+                        PubsubProtCrc::Crc_None, PubSubPid::PUBLISH, std::vector<uint8_t>{ 0x14, 0x0 }),
+        std::make_tuple(PubSubIdSize::ID_7BYTE, PubSubPayloadParametersSize::PAYLOAD_0BYTE, PubsubProtQoS::QoS0,
+                        PubsubProtCrc::Crc_None, PubSubPid::PUBLISH, std::vector<uint8_t>{ 0x18, 0x0 }),
+        std::make_tuple(PubSubIdSize::ID_8BYTE, PubSubPayloadParametersSize::PAYLOAD_0BYTE, PubsubProtQoS::QoS0,
+                        PubsubProtCrc::Crc_None, PubSubPid::PUBLISH, std::vector<uint8_t>{ 0x1c, 0x0 })
+
+            ));
 
 TEST_P(PubSubTest, _1)
 {
     auto params                              = GetParam();
-    int buffer_size                          = std::get<0>(params);
-    PubSubIdSize id_size                     = std::get<1>(params);
-    PubSubPayloadParametersSize payload_size = std::get<2>(params);
-    PubsubProtQoS qos                        = std::get<3>(params);
-    PubsubProtCrc crc                        = std::get<4>(params);
-    PubSubPid pid                            = std::get<5>(params);
-    std::vector<uint8_t> expected_header     = std::get<6>(params);
+    PubSubIdSize id_size                     = std::get<0>(params);
+    PubSubPayloadParametersSize payload_size = std::get<1>(params);
+    PubsubProtQoS qos                        = std::get<2>(params);
+    PubsubProtCrc crc                        = std::get<3>(params);
+    PubSubPid pid                            = std::get<4>(params);
+    std::vector<uint8_t> expected_header     = std::get<5>(params);
 
     PubSubHeaderV1 header = {
-        .version = 0, .id_size = id_size, .payload_length_size = payload_size, .qos = qos, .crc = crc, .pid = pid
+        .id_size = id_size, .payload_length_size = payload_size, .qos = qos, .crc = crc, .pid = pid
     };
 
-    std::vector<uint8_t> parsed_header{};
-    parsed_header.reserve(buffer_size);
-    ASSERT_EQ(packHeaderV1(header, parsed_header.data(), parsed_header.capacity()), 2);
+    uint8_t parsed_header[2]{};
+    ASSERT_EQ(packHeaderV1(header, parsed_header, 2), 2);
+    ASSERT_THAT(expected_header, ElementsAreArray(parsed_header));
 }
