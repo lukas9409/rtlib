@@ -14,7 +14,9 @@ set(TESTED_FILES
     ../src/for_tests/list.c
     ../src/for_tests/vector.c
     ../src/for_tests/object_pool.c
-    ../src/protocols/publish_subscribe/pubsub_prot.cpp)
+    ../src/protocols/publish_subscribe/pubsub_prot.cpp
+    ../src/protocols/publish_subscribe/common.c
+    )
 
 set(TESTS
     list_test.cpp

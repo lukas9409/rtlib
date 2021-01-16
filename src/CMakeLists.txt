@@ -3,7 +3,8 @@ set(LIB_SOURCES
     for_tests/vector.c
     for_tests/heap.c
     for_tests/object_pool.c
-    protocols/publish_subscribe/pubsub_prot.cpp)
+    protocols/publish_subscribe/pubsub_prot.cpp
+    protocols/publish_subscribe/common.c)
 
 set (CMAKE_CXX_STANDARD 17)
 

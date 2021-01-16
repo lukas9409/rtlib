@@ -19,6 +19,8 @@ public:
     int yield();
 
 private:
+    
+
     IPubSubTransportLayer* m_transport_layer;
     IPubSubSystemUtils* m_system_utils;
 };

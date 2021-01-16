@@ -1,5 +1,6 @@
 #include "pubsub_prot.hpp"
 #include <cassert>
+#include <string.h>
 
 PubSubProtocol::PubSubProtocol(IPubSubTransportLayer* transport_layer, IPubSubSystemUtils* system_utils)
  : m_transport_layer{transport_layer},
@@ -45,6 +46,14 @@ int PubSubProtocol::publish(int64_t id, const uint8_t* data, int size, Transmiss
     }
     const size_t to_alloc_bytes = sizeof(header) + (header.id_size + 1) + header.payload_length_size + size + crc_size;
     uint8_t* to_send_data = (uint8_t*)malloc(to_alloc_bytes);
+    memcpy(to_send_data, &header, sizeof(header));
+    // memcpy(to_send_data + sizeof(header), , sizeof(header));
+    // memcpy(to_send_data + sizeof(header), , header.id_size + 1);
+    memcpy(to_send_data + sizeof(header) + header.id_size + 1 + header.payload_length_size,
+    data, size);
+
+    
+
     m_transport_layer->write(to_send_data, to_alloc_bytes);
     return 0;
 }
