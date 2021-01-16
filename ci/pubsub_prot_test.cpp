@@ -62,7 +62,11 @@ INSTANTIATE_TEST_SUITE_P(
         std::make_tuple(PubSubIdSize::ID_1BYTE, PubSubPayloadParametersSize::PAYLOAD_0BYTE, PubsubProtQoS::QoS0,
                         PubsubProtCrc::Crc_16, PubSubPid::PUBLISH, std::vector<uint8_t>{ 0x0, 0x20 }),
         std::make_tuple(PubSubIdSize::ID_1BYTE, PubSubPayloadParametersSize::PAYLOAD_0BYTE, PubsubProtQoS::QoS0,
-                        PubsubProtCrc::Crc_32, PubSubPid::PUBLISH, std::vector<uint8_t>{ 0x0, 0x30 })
+                        PubsubProtCrc::Crc_32, PubSubPid::PUBLISH, std::vector<uint8_t>{ 0x0, 0x30 }),
+        std::make_tuple(PubSubIdSize::ID_1BYTE, PubSubPayloadParametersSize::PAYLOAD_0BYTE, PubsubProtQoS::QoS0,
+                        PubsubProtCrc::Crc_None, PubSubPid::PUBACK, std::vector<uint8_t>{ 0x0, 0x1 }),
+        std::make_tuple(PubSubIdSize::ID_1BYTE, PubSubPayloadParametersSize::PAYLOAD_0BYTE, PubsubProtQoS::QoS0,
+                        PubsubProtCrc::Crc_None, PubSubPid::PUBNACK, std::vector<uint8_t>{ 0x0, 0x2 })
 
             ));
 
