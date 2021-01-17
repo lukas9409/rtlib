@@ -70,7 +70,7 @@ INSTANTIATE_TEST_SUITE_P(
 
             ));
 
-TEST_P(PubSubTest, _1)
+TEST_P(PubSubTest, PackHeaderV1)
 {
     auto params                              = GetParam();
     PubSubIdSize id_size                     = std::get<0>(params);
@@ -87,4 +87,24 @@ TEST_P(PubSubTest, _1)
     uint8_t parsed_header[2]{};
     ASSERT_EQ(packHeaderV1(header, parsed_header, 2), 2);
     ASSERT_THAT(parsed_header, ElementsAreArray(expected_header));
+}
+
+TEST_P(PubSubTest, UnpackHeaderV1)
+{
+    auto params                              = GetParam();
+    PubSubIdSize id_size                     = std::get<0>(params);
+    PubSubPayloadParametersSize payload_size = std::get<1>(params);
+    PubsubProtQoS qos                        = std::get<2>(params);
+    PubsubProtCrc crc                        = std::get<3>(params);
+    PubSubPid pid                            = std::get<4>(params);
+    std::vector<uint8_t> input_header        = std::get<5>(params);
+
+    PubSubHeaderV1 header{};
+
+    ASSERT_EQ(unpackHeaderV1(&header, input_header.data(), 2), 2);
+    ASSERT_EQ(id_size, header.id_size);
+    ASSERT_EQ(payload_size, header.payload_length_size);
+    ASSERT_EQ(qos, header.qos);
+    ASSERT_EQ(crc, header.crc);
+    ASSERT_EQ(pid, header.pid);
 }

@@ -49,5 +49,33 @@ int packHeaderV1(PubSubHeaderV1 header, uint8_t * data, int size)
 
 int unpackHeaderV1(PubSubHeaderV1 * header, const uint8_t * data, int size)
 {
-    return 0;
+    if(!header || !data)
+    {
+        return -1;
+    }
+
+    if(size < sizeof(PubSubHeaderV1))
+    {
+        return -1;
+    }
+    uint8_t version = (data[0] >> 5) & 0b111;
+
+    if(version != VERSION_1)
+    {
+        return -1;
+    }
+
+    uint8_t id_size             = (data[0] >> 2) & 0b111;
+    uint8_t payload_length_size = data[0] & 0b11;
+    uint8_t qos                 = (data[1] >> 6) & 0b11;
+    uint8_t crc                 = (data[1] >> 4) & 0b11;
+    uint8_t pid                 = (data[1]) & 0b1111;
+
+    header->id_size             = id_size;
+    header->payload_length_size = payload_length_size;
+    header->qos                 = qos;
+    header->crc                 = crc;
+    header->pid                 = pid;
+
+    return sizeof(*header);
 }
