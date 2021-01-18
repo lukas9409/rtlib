@@ -172,6 +172,7 @@ INSTANTIATE_TEST_SUITE_P(
 
     ));
 // clang-format on
+
 TEST_P(MessageIdTest, PackV1)
 {
     auto params                          = GetParam();
@@ -184,4 +185,18 @@ TEST_P(MessageIdTest, PackV1)
     uint8_t parsed_header[8]{};
     ASSERT_EQ(packMessageIdV1(header, message_id, parsed_header, 8), id_size + 1);
     ASSERT_THAT(parsed_header, ElementsAreArray(expected_output));
+}
+
+TEST_P(MessageIdTest, UnpackV1)
+{
+    auto params                  = GetParam();
+    PubSubIdSize id_size         = std::get<0>(params);
+    uint64_t expected_message_id = std::get<1>(params);
+    std::vector<uint8_t> intput  = std::get<2>(params);
+
+    PubSubHeaderV1 header = { .id_size = id_size };
+
+    uint64_t message_id{};
+    ASSERT_EQ(unpackMessageIdV1(header, &message_id, intput.data(), intput.size()), id_size + 1);
+    ASSERT_EQ(expected_message_id, message_id);
 }

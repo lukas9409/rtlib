@@ -346,6 +346,71 @@ int packMessageIdV1(PubSubHeaderV1 header, uint64_t message_id, uint8_t * output
     return message_id_size;
 }
 
+int unpackMessageIdV1(PubSubHeaderV1 header, uint64_t * message_id, const uint8_t * input, int input_size)
+{
+    *message_id = 0;
+    switch(header.id_size)
+    {
+        case ID_1BYTE: {
+            uint32_t temp = input[0];
+            *message_id   = (uint64_t)temp;
+        }
+        break;
+
+        case ID_2BYTE: {
+            uint32_t temp = (input[0] << 8) | input[1];
+            *message_id   = (uint64_t)temp;
+        }
+        break;
+
+        case ID_3BYTE: {
+            uint32_t temp = (input[0] << 16) | (input[1] << 8) | input[2];
+            *message_id   = (uint64_t)temp;
+        }
+        break;
+
+        case ID_4BYTE: {
+            uint32_t temp = (input[0] << 24) | (input[1] << 16) | (input[2] << 8) | input[3];
+            *message_id   = (uint64_t)temp;
+        }
+        break;
+
+        case ID_5BYTE: {
+            uint32_t temp1 = (input[0] << 24) | (input[1] << 16) | (input[2] << 8) | input[3];
+            uint32_t temp2 = input[4];
+            *message_id    = (uint64_t)temp1 << 8 | (uint64_t)temp2;
+        }
+        break;
+
+        case ID_6BYTE: {
+            uint32_t temp1 = (input[0] << 24) | (input[1] << 16) | (input[2] << 8) | input[3];
+            uint32_t temp2 = (input[4] << 8) | input[5];
+            *message_id    = (uint64_t)temp1 << 16 | (uint64_t)temp2;
+        }
+        break;
+
+        case ID_7BYTE: {
+            uint32_t temp1 = (input[0] << 24) | (input[1] << 16) | (input[2] << 8) | input[3];
+            uint32_t temp2 = (input[4] << 16) | (input[5] << 8) | input[6];
+            *message_id    = (uint64_t)temp1 << 24 | (uint64_t)temp2;
+        }
+        break;
+
+        case ID_8BYTE: {
+            uint32_t temp1 = (input[0] << 24) | (input[1] << 16) | (input[2] << 8) | input[3];
+            uint32_t temp2 = (input[4] << 24) | (input[5] << 16) | (input[6] << 8) | input[7];
+            *message_id    = (uint64_t)temp1 << 32 | (uint64_t)temp2;
+        }
+        break;
+
+        default:
+            return -1;
+            break;
+    }
+    int message_id_size = getIdSizeInBytesFromHeader(header);
+    return message_id_size;
+}
+
 static int packPayloadSizeV1(PubSubHeaderV1 header, int payload_size, uint8_t * output, int output_size)
 {
     switch(header.payload_length_size)
