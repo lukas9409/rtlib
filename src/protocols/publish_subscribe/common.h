@@ -19,10 +19,15 @@ extern "C"
 
     typedef enum
     {
+        // External errors
         ALLOCATION_ERROR = -255,
         INVALID_CRC,
         UNKNOWN_VERSION,
-        TIMEOUT,
+
+        // Internal errors
+        TIMEOUT = -127,
+        ARGUMENT_MISMATCH,
+
         OK = 0
     } PubsubProtErrorCode;
 
@@ -95,6 +100,10 @@ extern "C"
 
     int packHeaderV1(PubSubHeaderV1 header, uint8_t * data, int size);
     int unpackHeaderV1(PubSubHeaderV1 * header, const uint8_t * data, int size);
+    int packMessageIdV1(PubSubHeaderV1 header, uint64_t message_id, uint8_t * output, int output_size);
+    // int packPayloadV1(PubSubHeaderV1 header, uint64_t message_id, uint8_t * payload, int payload_size, uint8_t *
+    // output,
+    //                   int output_size);
 
 #ifdef __cplusplus
 }
