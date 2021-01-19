@@ -21,7 +21,7 @@ typedef struct PubSubHeaderV1Internal
     uint8_t pid : 4;
 } PubSubHeaderV1Internal;
 
-uint8_t crc8(uint8_t * data, size_t len)
+uint8_t crc8(const uint8_t * data, size_t len)
 {
     uint8_t crc = 0xff;
     size_t i, j;
@@ -236,61 +236,6 @@ static int getPayloadLengthFieldSizeInBytesFromHeader(PubSubHeaderV1 header)
         size = header.payload_length_size;
     }
     return size;
-}
-
-static int getCrcSizeInBytesFromHeader(PubSubHeaderV1 header)
-{
-    int size = -1;
-
-    switch(header.crc)
-    {
-        case Crc_None:
-            size = 0;
-            break;
-
-        case Crc_8:
-            size = 1;
-            break;
-
-        case Crc_16:
-            size = 2;
-            break;
-
-        case Crc_32:
-            size = 4;
-            break;
-
-        default:
-            break;
-    }
-    return size;
-}
-
-static int calculateRequiredPayloadSectionSize(PubSubHeaderV1 header, int payload_size)
-{
-    if(payload_size < 0)
-    {
-        return -1;
-    }
-
-    int message_id_size = getIdSizeInBytesFromHeader(header);
-    if(message_id_size < 0)
-    {
-        return -1;
-    }
-
-    int payload_length_size = getPayloadLengthFieldSizeInBytesFromHeader(header);
-    if(payload_length_size < 0)
-    {
-        return -1;
-    }
-
-    int crc_size = getCrcSizeInBytesFromHeader(header);
-    if(crc_size < 0)
-    {
-        return -1;
-    }
-    return message_id_size + payload_length_size + payload_size + crc_size;
 }
 
 int packMessageIdV1(PubSubHeaderV1 header, uint64_t message_id, uint8_t * output, int output_size)
