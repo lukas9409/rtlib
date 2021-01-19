@@ -300,7 +300,7 @@ TEST_P(PayloadTest, UnpackV1)
     ASSERT_EQ(input, payload_vector);
 }
 
-class CrcTest : public testing::TestWithParam<std::tuple<std::vector<uint8_t>, PubsubProtCrc, std::vector<uint8_t>>>
+class CrcTest : public testing::TestWithParam<std::tuple<std::vector<uint8_t>, PubsubProtCrc>>
 {
    public:
     MockPubSubTransportLayer transportLayer{};
@@ -309,23 +309,23 @@ class CrcTest : public testing::TestWithParam<std::tuple<std::vector<uint8_t>, P
 };
 
 INSTANTIATE_TEST_SUITE_P(CrcTest, CrcTest,
-                         testing::Values(std::make_tuple(std::vector<uint8_t>{ 0x1, 0x2, 0x3 }, PubsubProtCrc::Crc_None,
-                                                         std::vector<uint8_t>{ 0x1, 0x2, 0x3 }),
-                                         std::make_tuple(std::vector<uint8_t>{ 0x1, 0x2, 0x3 }, PubsubProtCrc::Crc_8,
-                                                         std::vector<uint8_t>{ 0x1, 0x2, 0x3 }),
-                                         std::make_tuple(std::vector<uint8_t>{ 0x1, 0x2, 0x3 }, PubsubProtCrc::Crc_16,
-                                                         std::vector<uint8_t>{ 0x1, 0x2, 0x3 }),
-                                         std::make_tuple(std::vector<uint8_t>{ 0x1, 0x2, 0x3 }, PubsubProtCrc::Crc_32,
-                                                         std::vector<uint8_t>{ 0x1, 0x2, 0x3 })
+                         testing::Values(std::make_tuple(std::vector<uint8_t>{ 0x1, 0x2, 0x3 },
+                                                         PubsubProtCrc::Crc_None),
+                                         std::make_tuple(std::vector<uint8_t>{ 0x1, 0x2, 0x3 }, PubsubProtCrc::Crc_8),
+                                         std::make_tuple(std::vector<uint8_t>{ 0x1, 0x2, 0x3 }, PubsubProtCrc::Crc_16),
+                                         std::make_tuple(std::vector<uint8_t>{ 0x1, 0x2, 0x3 }, PubsubProtCrc::Crc_32),
+                                         std::make_tuple(std::vector<uint8_t>(1000, 0xab), PubsubProtCrc::Crc_None),
+                                         std::make_tuple(std::vector<uint8_t>(1000, 0xab), PubsubProtCrc::Crc_8),
+                                         std::make_tuple(std::vector<uint8_t>(1000, 0xab), PubsubProtCrc::Crc_16),
+                                         std::make_tuple(std::vector<uint8_t>(1000, 0xab), PubsubProtCrc::Crc_32)
 
                                              ));
 
 TEST_P(CrcTest, CalculateAndPackV1)
 {
-    auto params                          = GetParam();
-    std::vector<uint8_t> payload         = std::get<0>(params);
-    PubsubProtCrc crc_type               = std::get<1>(params);
-    std::vector<uint8_t> expected_output = std::get<2>(params);
+    auto params                  = GetParam();
+    std::vector<uint8_t> payload = std::get<0>(params);
+    PubsubProtCrc crc_type       = std::get<1>(params);
 
     PubSubHeaderV1 header = { .crc = crc_type };
 
@@ -342,14 +342,10 @@ TEST_P(CrcTest, CalculateAndPackV1)
     uint8_t crc_output[4]{};
     ASSERT_EQ(calculateAndPackCrcV1(header, payload.data(), payload.size(), crc_output, 4), crc_size);
 
-    printf("Crc=0x");
     for(int i = 0; i < crc_size; ++i)
     {
-        printf("%x", crc_output[i]);
         payload.push_back(crc_output[i]);
     }
-    printf("\n");
-    // ASSERT_EQ(expected_output, payload);
 
     ASSERT_EQ(true, verifyCrcV1(header, payload.data(), payload.size()));
 }
