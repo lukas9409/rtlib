@@ -202,7 +202,7 @@ TEST_P(MessageIdTest, UnpackV1)
 }
 
 class PayloadSizeTest
-    : public testing::TestWithParam<std::tuple<PubSubPayloadParametersSize, uint32_t, std::vector<uint8_t>>>
+    : public testing::TestWithParam<std::tuple<PubSubPayloadParametersSize, int, std::vector<uint8_t>>>
 {
    public:
     MockPubSubTransportLayer transportLayer{};
@@ -231,7 +231,7 @@ TEST_P(PayloadSizeTest, PackV1)
 {
     auto params                              = GetParam();
     PubSubPayloadParametersSize payload_size = std::get<0>(params);
-    uint32_t value                           = std::get<1>(params);
+    int value                                = std::get<1>(params);
     std::vector<uint8_t> expected_output     = std::get<2>(params);
 
     PubSubHeaderV1 header = { .payload_length_size = payload_size };
@@ -245,12 +245,57 @@ TEST_P(PayloadSizeTest, UnpackV1)
 {
     auto params                              = GetParam();
     PubSubPayloadParametersSize payload_size = std::get<0>(params);
-    uint32_t expected_value                  = std::get<1>(params);
+    int expected_value                       = std::get<1>(params);
     std::vector<uint8_t> input               = std::get<2>(params);
 
     PubSubHeaderV1 header = { .payload_length_size = payload_size };
-    uint32_t value{};
+    int value{};
 
     ASSERT_EQ(unpackPayloadSizeV1(header, &value, input.data(), input.size()), payload_size);
     ASSERT_EQ(expected_value, value);
+}
+
+class PayloadTest : public testing::TestWithParam<std::tuple<std::vector<uint8_t>>>
+{
+   public:
+    MockPubSubTransportLayer transportLayer{};
+    MockPubSubSystemUtils systemUtils{};
+    PubSubProtocol protocol{ &transportLayer, &systemUtils };
+};
+
+INSTANTIATE_TEST_SUITE_P(
+    PayloadTest, PayloadTest,
+    testing::Values(std::make_tuple(std::vector<uint8_t>{}), std::make_tuple(std::vector<uint8_t>{ 0x1 }),
+                    std::make_tuple(std::vector<uint8_t>{ 0xf }), std::make_tuple(std::vector<uint8_t>{ 0xff }),
+                    std::make_tuple(std::vector<uint8_t>{ 0x0, 0x1, 0x0 }),
+                    std::make_tuple(std::vector<uint8_t>{ 0xff, 0xff, 0xff }),
+                    std::make_tuple(std::vector<uint8_t>(100, 0xff)), std::make_tuple(std::vector<uint8_t>(100, 0x0)),
+                    std::make_tuple(std::vector<uint8_t>(10000, 0xff))
+
+                        ));
+
+TEST_P(PayloadTest, PackV1)
+{
+    auto params                  = GetParam();
+    std::vector<uint8_t> payload = std::get<0>(params);
+
+    uint8_t output[payload.size()]{};
+    std::vector<uint8_t> output_vector{};
+
+    ASSERT_EQ(packPayloadV1(payload.data(), payload.size(), output, payload.size()), payload.size());
+    output_vector.assign(output, output + payload.size());
+    ASSERT_EQ(payload, output_vector);
+}
+
+TEST_P(PayloadTest, UnpackV1)
+{
+    auto params                = GetParam();
+    std::vector<uint8_t> input = std::get<0>(params);
+
+    uint8_t payload[input.size()]{};
+    std::vector<uint8_t> payload_vector{};
+
+    ASSERT_EQ(unpackPayloadV1(payload, input.size(), input.data(), input.size()), input.size());
+    payload_vector.assign(payload, payload + input.size());
+    ASSERT_EQ(input, payload_vector);
 }

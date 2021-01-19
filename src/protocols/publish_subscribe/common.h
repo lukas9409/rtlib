@@ -102,10 +102,10 @@ extern "C"
     int unpackHeaderV1(PubSubHeaderV1 * header, const uint8_t * data, int size);
     int packMessageIdV1(PubSubHeaderV1 header, uint64_t message_id, uint8_t * output, int output_size);
     int unpackMessageIdV1(PubSubHeaderV1 header, uint64_t * message_id, const uint8_t * input, int input_size);
-    int packPayloadSizeV1(PubSubHeaderV1 header, uint32_t payload_size, uint8_t * output, int output_size);
-    int unpackPayloadSizeV1(PubSubHeaderV1 header, uint32_t * payload_size, uint8_t * input, int input_size);
-    // output,
-    //                   int output_size);
+    int packPayloadSizeV1(PubSubHeaderV1 header, int payload_size, uint8_t * output, int output_size);
+    int unpackPayloadSizeV1(PubSubHeaderV1 header, int * payload_size, uint8_t * input, int input_size);
+    int packPayloadV1(const uint8_t * payload, int payload_size, uint8_t * output, int output_size);
+    int unpackPayloadV1(uint8_t * payload, int payload_size, const uint8_t * input, int input_size);
 
 #ifdef __cplusplus
 }

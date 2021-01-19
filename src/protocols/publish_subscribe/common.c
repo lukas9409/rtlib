@@ -411,7 +411,7 @@ int unpackMessageIdV1(PubSubHeaderV1 header, uint64_t * message_id, const uint8_
     return message_id_size;
 }
 
-int packPayloadSizeV1(PubSubHeaderV1 header, uint32_t payload_size, uint8_t * output, int output_size)
+int packPayloadSizeV1(PubSubHeaderV1 header, int payload_size, uint8_t * output, int output_size)
 {
     switch(header.payload_length_size)
     {
@@ -457,7 +457,7 @@ int packPayloadSizeV1(PubSubHeaderV1 header, uint32_t payload_size, uint8_t * ou
     return parsed_bytes;
 }
 
-int unpackPayloadSizeV1(PubSubHeaderV1 header, uint32_t * payload_size, uint8_t * input, int input_size)
+int unpackPayloadSizeV1(PubSubHeaderV1 header, int * payload_size, uint8_t * input, int input_size)
 {
     switch(header.payload_length_size)
     {
@@ -484,7 +484,7 @@ int unpackPayloadSizeV1(PubSubHeaderV1 header, uint32_t * payload_size, uint8_t 
     return parsed_bytes;
 }
 
-static int packPayloadV1(uint8_t * payload, int payload_size, uint8_t * output, int output_size)
+int packPayloadV1(const uint8_t * payload, int payload_size, uint8_t * output, int output_size)
 {
     if(payload_size > output_size)
     {
@@ -492,6 +492,16 @@ static int packPayloadV1(uint8_t * payload, int payload_size, uint8_t * output, 
     }
     memcpy(output, payload, payload_size);
 
+    return payload_size;
+}
+
+int unpackPayloadV1(uint8_t * payload, int payload_size, const uint8_t * input, int input_size)
+{
+    if(input_size < payload_size)
+    {
+        return -1;
+    }
+    memcpy(payload, input, payload_size);
     return payload_size;
 }
 
