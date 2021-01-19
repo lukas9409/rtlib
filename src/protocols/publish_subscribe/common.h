@@ -6,6 +6,7 @@ extern "C"
 #endif
 
 #include <stdint.h>
+#include <stdbool.h>
 
     /*
     +--------------------------------------------------------------+-------------------------------------+
@@ -106,6 +107,9 @@ extern "C"
     int unpackPayloadSizeV1(PubSubHeaderV1 header, int * payload_size, uint8_t * input, int input_size);
     int packPayloadV1(const uint8_t * payload, int payload_size, uint8_t * output, int output_size);
     int unpackPayloadV1(uint8_t * payload, int payload_size, const uint8_t * input, int input_size);
+    int calculateAndPackCrcV1(PubSubHeaderV1 header, uint8_t * packet_first_byte, int parsed_bytes, uint8_t * output,
+                              int output_size);
+    bool verifyCrcV1(PubSubHeaderV1 header, const uint8_t * packet, int size);
 
 #ifdef __cplusplus
 }
