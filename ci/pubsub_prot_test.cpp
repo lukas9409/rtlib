@@ -200,3 +200,57 @@ TEST_P(MessageIdTest, UnpackV1)
     ASSERT_EQ(unpackMessageIdV1(header, &message_id, intput.data(), intput.size()), id_size + 1);
     ASSERT_EQ(expected_message_id, message_id);
 }
+
+class PayloadSizeTest
+    : public testing::TestWithParam<std::tuple<PubSubPayloadParametersSize, uint32_t, std::vector<uint8_t>>>
+{
+   public:
+    MockPubSubTransportLayer transportLayer{};
+    MockPubSubSystemUtils systemUtils{};
+    PubSubProtocol protocol{ &transportLayer, &systemUtils };
+};
+
+INSTANTIATE_TEST_SUITE_P(
+    PayloadSizeTest, PayloadSizeTest,
+    testing::Values(
+        std::make_tuple(PubSubPayloadParametersSize::PAYLOAD_0BYTE, 0, std::vector<uint8_t>{ 0x0, 0x0, 0x0 }),
+        std::make_tuple(PubSubPayloadParametersSize::PAYLOAD_1BYTE, 0x1, std::vector<uint8_t>{ 0x1, 0x0, 0x0 }),
+        std::make_tuple(PubSubPayloadParametersSize::PAYLOAD_1BYTE, 0xf, std::vector<uint8_t>{ 0xf, 0x0, 0x0 }),
+        std::make_tuple(PubSubPayloadParametersSize::PAYLOAD_1BYTE, 0xff, std::vector<uint8_t>{ 0xff, 0x0, 0x0 }),
+        std::make_tuple(PubSubPayloadParametersSize::PAYLOAD_2BYTE, 0x1, std::vector<uint8_t>{ 0x0, 0x1, 0x0 }),
+        std::make_tuple(PubSubPayloadParametersSize::PAYLOAD_2BYTE, 0x100, std::vector<uint8_t>{ 0x1, 0x0, 0x0 }),
+        std::make_tuple(PubSubPayloadParametersSize::PAYLOAD_2BYTE, 0xffff, std::vector<uint8_t>{ 0xff, 0xff, 0x0 }),
+        std::make_tuple(PubSubPayloadParametersSize::PAYLOAD_3BYTE, 0x1, std::vector<uint8_t>{ 0x0, 0x0, 0x1 }),
+        std::make_tuple(PubSubPayloadParametersSize::PAYLOAD_3BYTE, 0x100, std::vector<uint8_t>{ 0x0, 0x1, 0x0 }),
+        std::make_tuple(PubSubPayloadParametersSize::PAYLOAD_3BYTE, 0x10000, std::vector<uint8_t>{ 0x1, 0x0, 0x0 }),
+        std::make_tuple(PubSubPayloadParametersSize::PAYLOAD_3BYTE, 0xffffff, std::vector<uint8_t>{ 0xff, 0xff, 0xff })
+
+            ));
+
+TEST_P(PayloadSizeTest, PackV1)
+{
+    auto params                              = GetParam();
+    PubSubPayloadParametersSize payload_size = std::get<0>(params);
+    uint32_t value                           = std::get<1>(params);
+    std::vector<uint8_t> expected_output     = std::get<2>(params);
+
+    PubSubHeaderV1 header = { .payload_length_size = payload_size };
+
+    uint8_t parsed_header[3]{};
+    ASSERT_EQ(packPayloadSizeV1(header, value, parsed_header, 3), payload_size);
+    ASSERT_THAT(parsed_header, ElementsAreArray(expected_output));
+}
+
+TEST_P(PayloadSizeTest, UnpackV1)
+{
+    auto params                              = GetParam();
+    PubSubPayloadParametersSize payload_size = std::get<0>(params);
+    uint32_t expected_value                  = std::get<1>(params);
+    std::vector<uint8_t> input               = std::get<2>(params);
+
+    PubSubHeaderV1 header = { .payload_length_size = payload_size };
+    uint32_t value{};
+
+    ASSERT_EQ(unpackPayloadSizeV1(header, &value, input.data(), input.size()), payload_size);
+    ASSERT_EQ(expected_value, value);
+}

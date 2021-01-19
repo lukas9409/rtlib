@@ -411,7 +411,7 @@ int unpackMessageIdV1(PubSubHeaderV1 header, uint64_t * message_id, const uint8_
     return message_id_size;
 }
 
-static int packPayloadSizeV1(PubSubHeaderV1 header, int payload_size, uint8_t * output, int output_size)
+int packPayloadSizeV1(PubSubHeaderV1 header, uint32_t payload_size, uint8_t * output, int output_size)
 {
     switch(header.payload_length_size)
     {
@@ -447,6 +447,33 @@ static int packPayloadSizeV1(PubSubHeaderV1 header, int payload_size, uint8_t * 
             output[0] = (payload_size >> 16) & 0xff;
             output[1] = (payload_size >> 8) & 0xff;
             output[2] = payload_size & 0xff;
+            break;
+
+        default:
+            return -1;
+            break;
+    }
+    const int parsed_bytes = getPayloadLengthFieldSizeInBytesFromHeader(header);
+    return parsed_bytes;
+}
+
+int unpackPayloadSizeV1(PubSubHeaderV1 header, uint32_t * payload_size, uint8_t * input, int input_size)
+{
+    switch(header.payload_length_size)
+    {
+        case PAYLOAD_0BYTE:
+            break;
+
+        case PAYLOAD_1BYTE:
+            *payload_size = input[0];
+            break;
+
+        case PAYLOAD_2BYTE:
+            *payload_size = (input[0] << 8) | input[1];
+            break;
+
+        case PAYLOAD_3BYTE:
+            *payload_size = (input[0] << 16) | (input[1] << 8) | input[2];
             break;
 
         default:
